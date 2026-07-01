@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   createCongregationAction,
   deleteCongregationAction,
+  importCongregationsCsvAction,
   logoutAction,
   updateCongregationAction,
 } from "@/app/actions";
@@ -54,6 +55,39 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
       {params.error ? (
         <p className="rounded-md border border-red-300 bg-red-50 px-3 py-2 text-sm text-red-800">{params.error}</p>
       ) : null}
+
+      <section className="rounded-xl border border-zinc-200 p-4">
+        <h2 className="mb-3 text-lg font-semibold">CSV Import / Export</h2>
+        <div className="grid gap-4 sm:grid-cols-2">
+          <form action={importCongregationsCsvAction} className="space-y-2 rounded-md border border-zinc-200 p-3">
+            <p className="text-sm font-medium">Import Congregations CSV</p>
+            <input
+              type="file"
+              name="csvFile"
+              accept=".csv,text/csv"
+              required
+              className="w-full text-sm file:mr-3 file:rounded-md file:border file:border-zinc-300 file:bg-white file:px-3 file:py-2"
+            />
+            <p className="text-xs text-zinc-600">
+              Header: name,overseer,contactPrimary,contactAlternate,meetingDay1,meetingDay2,isActive
+            </p>
+            <button type="submit" className="rounded-md bg-zinc-900 px-3 py-2 text-sm font-semibold text-white">
+              Import CSV
+            </button>
+          </form>
+
+          <div className="space-y-2 rounded-md border border-zinc-200 p-3">
+            <p className="text-sm font-medium">Export Congregations CSV</p>
+            <p className="text-xs text-zinc-600">Downloads all congregations in the same import format.</p>
+            <a
+              href="/api/congregations/export"
+              className="inline-block rounded-md border border-zinc-300 px-3 py-2 text-sm font-medium"
+            >
+              Export CSV
+            </a>
+          </div>
+        </div>
+      </section>
 
       <section className="rounded-xl border border-zinc-200 p-4">
         <h2 className="mb-3 text-lg font-semibold">Add Congregation</h2>

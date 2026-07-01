@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { type Prisma } from "@prisma/client";
+import { parseCsv } from "@/lib/csv";
 import { prisma } from "@/lib/prisma";
 import { createAdminSession, clearAdminSession, isAdminAuthenticated, verifyPassword } from "@/lib/auth";
 import { generateAssignments } from "@/lib/scheduler";
@@ -141,6 +142,105 @@ export async function deleteCongregationAction(formData: FormData): Promise<void
       error: "Could not delete congregation. Ensure no assignment references it.",
     });
   }
+}
+
+function parseCsvBoolean(value: string): boolean {
+  const normalized = value.trim().toLowerCase();
+  return normalized === "true" || normalized === "1" || normalized === "yes";
+}
+
+function parseCsvMeetingDay(value: string): number {
+  const parsed = Number.parseInt(value.trim(), 10);
+  if (!Number.isInteger(parsed) || parsed < 0 || parsed > 6) {
+    throw new Error(`Invalid meeting day '${value}'. Use 0-6.`);
+  }
+  return parsed;
+}
+
+export async function importCongregationsCsvAction(formData: FormData): Promise<void> {
+  await assertAdmin();
+
+  const csvFile = formData.get("csvFile");
+  if (!(csvFile instanceof File)) {
+    redirectWithStatus("/congregations", { error: "Please upload a CSV file." });
+  }
+
+  if (csvFile.size > 1_000_000) {
+    redirectWithStatus("/congregations", { error: "CSV file too large. Limit is 1MB." });
+  }
+
+  const content = await csvFile.text();
+  const rows = parseCsv(content);
+  if (rows.length === 0) {
+    redirectWithStatus("/congregations", { error: "CSV is empty." });
+  }
+
+  const [header, ...dataRows] = rows;
+  const expectedHeader = [
+    "name",
+    "overseer",
+    "contactPrimary",
+    "contactAlternate",
+    "meetingDay1",
+    "meetingDay2",
+    "isActive",
+  ];
+
+  const headerValid = expectedHeader.every((key, index) => header?.[index]?.trim() === key);
+  if (!headerValid) {
+    redirectWithStatus("/congregations", {
+      error: `Invalid CSV header. Expected: ${expectedHeader.join(",")}`,
+    });
+  }
+
+  let upserted = 0;
+  const rowErrors: string[] = [];
+
+  for (let index = 0; index < dataRows.length; index += 1) {
+    const row = dataRows[index] ?? [];
+    if (row.length === 0 || row.every((value) => value.trim().length === 0)) {
+      continue;
+    }
+
+    try {
+      const rowData = {
+        name: row[0]?.trim() ?? "",
+        overseer: row[1]?.trim() ?? "",
+        contactPrimary: row[2]?.trim() ?? "",
+        contactAlternate: row[3]?.trim() || undefined,
+        meetingDays: [parseCsvMeetingDay(row[4] ?? ""), parseCsvMeetingDay(row[5] ?? "")],
+        isActive: parseCsvBoolean(row[6] ?? "true"),
+      };
+
+      const parsed = congregationInputSchema.parse(rowData);
+      await prisma.congregation.upsert({
+        where: { name: parsed.name },
+        create: parsed,
+        update: parsed,
+      });
+      upserted += 1;
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown row error";
+      rowErrors.push(`row ${index + 2}: ${message}`);
+    }
+  }
+
+  await createAuditLog("CONGREGATION_CSV_IMPORT", {
+    imported: upserted,
+    failed: rowErrors.length,
+    errors: rowErrors.slice(0, 10),
+  });
+
+  revalidatePath("/congregations");
+  revalidatePath("/");
+
+  if (rowErrors.length > 0) {
+    redirectWithStatus("/congregations", {
+      ok: `Imported ${upserted} rows with ${rowErrors.length} row error(s). First: ${rowErrors[0]}`,
+    });
+  }
+
+  redirectWithStatus("/congregations", { ok: `Imported ${upserted} congregation row(s).` });
 }
 
 export async function updateSchedulerConfigAction(formData: FormData): Promise<void> {

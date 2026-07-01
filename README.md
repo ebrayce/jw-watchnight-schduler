@@ -72,6 +72,11 @@ pnpm prisma:migrate --name init
 pnpm db:seed
 ```
 
+Seed outcome:
+
+- Ensures scheduler config exists
+- Inserts 6 starter congregations (skips duplicates if they already exist)
+
 5. Start app
 
 ```bash
@@ -86,6 +91,23 @@ Open `http://localhost:3000` and sign in at `/login`.
 - `/congregations` manage congregations
 - `/settings` scheduler configuration
 - `/schedule` auto-generate + manual overrides
+
+## Congregation CSV Import / Export
+
+From `/congregations`:
+
+- **Export:** click `Export CSV` (downloads all congregations)
+- **Import:** upload a `.csv` file via `Import Congregations CSV`
+
+Required CSV header:
+
+`name,overseer,contactPrimary,contactAlternate,meetingDay1,meetingDay2,isActive`
+
+Rules:
+
+- `meetingDay1` and `meetingDay2` must be numbers `0-6` (Sun=0 ... Sat=6)
+- `isActive` accepts `true/false`, `1/0`, or `yes/no`
+- Import is idempotent by congregation name (upsert)
 
 ## Smoke Test (Scheduler Core)
 
