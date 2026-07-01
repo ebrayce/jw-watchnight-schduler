@@ -281,6 +281,7 @@ export async function generateScheduleAction(): Promise<void> {
   await createAuditLog("SCHEDULE_GENERATED", {
     windowDays: config.assignmentWindowDays,
     assignmentsPerDay: config.assignmentsPerDay,
+    removed: result.removed,
     created: result.created,
     unassignedDates: result.unassignedDates,
     conflicts: result.conflicts,
@@ -295,11 +296,13 @@ export async function generateScheduleAction(): Promise<void> {
       .join("; ");
 
     redirectWithStatus("/schedule", {
-      ok: `Generated ${result.created} assignments. ${result.conflicts.length} conflict(s): ${preview}`,
+      ok: `Removed ${result.removed} previous auto assignment(s). Generated ${result.created} assignment(s). ${result.conflicts.length} conflict(s): ${preview}`,
     });
   }
 
-  redirectWithStatus("/schedule", { ok: `Generated ${result.created} assignments.` });
+  redirectWithStatus("/schedule", {
+    ok: `Removed ${result.removed} previous auto assignment(s). Generated ${result.created} assignment(s).`,
+  });
 }
 
 export async function overrideAssignmentAction(formData: FormData): Promise<void> {

@@ -17,12 +17,22 @@ function addDays(input: Date, days: number): Date {
 
 
 export async function generateAssignments(config: SchedulerConfig): Promise<{
+  removed: number;
   created: number;
   unassignedDates: string[];
   conflicts: { date: string; slot: number; reason: string }[];
 }> {
   const today = startOfDay(new Date());
   const endDate = addDays(today, config.assignmentWindowDays);
+
+  const removedResult = await prisma.assignment.deleteMany({
+    where: {
+      source: "AUTO",
+      date: {
+        gte: today,
+      },
+    },
+  });
 
   const congregations = await prisma.congregation.findMany({
     where: { isActive: true },
@@ -70,7 +80,7 @@ export async function generateAssignments(config: SchedulerConfig): Promise<{
   );
 
   if (rowsToCreate.length === 0) {
-    return { created: 0, unassignedDates, conflicts };
+    return { removed: removedResult.count, created: 0, unassignedDates, conflicts };
   }
 
   const created = await prisma.$transaction(async (tx) => {
@@ -89,7 +99,7 @@ export async function generateAssignments(config: SchedulerConfig): Promise<{
     return count;
   });
 
-  return { created, unassignedDates, conflicts };
+  return { removed: removedResult.count, created, unassignedDates, conflicts };
 }
 
 
