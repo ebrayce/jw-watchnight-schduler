@@ -6,14 +6,14 @@ type LoginFormProps = {
 export function LoginForm({action, showError = false}: LoginFormProps) {
     return (
         <div
-            className="w-full max-w-md rounded-2xl border border-zinc-200 bg-white p-8 shadow-sm dark:border-zinc-800 dark:bg-zinc-950">
+            className="card w-full max-w-md rounded-2xl p-8 shadow-lg shadow-brand-deep/10">
             <form action={action} className="space-y-6">
                 {/* Header */}
                 <div className="space-y-1.5">
-                    <h1 className="text-2xl font-semibold tracking-tight text-zinc-900 dark:text-zinc-50">
+                    <h1 className="text-2xl font-semibold tracking-tight text-brand-deep">
                         Admin Login
                     </h1>
-                    <p className="text-sm text-zinc-500 dark:text-zinc-400">
+                    <p className="text-sm text-brand-muted">
                         Enter your credentials to access the dashboard.
                     </p>
                 </div>
@@ -22,7 +22,7 @@ export function LoginForm({action, showError = false}: LoginFormProps) {
                 <div className="space-y-2">
                     <label
                         htmlFor="password"
-                        className="text-sm font-medium leading-none text-zinc-700 dark:text-zinc-300"
+                        className="text-sm font-medium leading-none text-brand-muted"
                     >
                         Password
                     </label>
@@ -33,14 +33,14 @@ export function LoginForm({action, showError = false}: LoginFormProps) {
                         required
                         autoComplete="current-password"
                         placeholder="••••••••"
-                        className="w-full rounded-lg border border-zinc-200 bg-zinc-50 px-3 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 transition-all focus:border-zinc-900 focus:bg-white focus:outline-none focus:ring-2 focus:ring-zinc-900/10 dark:border-zinc-800 dark:bg-zinc-900 dark:text-zinc-50 dark:placeholder-zinc-600 dark:focus:border-zinc-50 dark:focus:bg-zinc-950 dark:focus:ring-zinc-50/10"
+                        className="w-full rounded-lg border border-brand-accent/50 bg-white px-3 py-2.5 text-sm text-brand-deep placeholder-brand-muted/70 transition-all focus:border-brand-accent focus:outline-none focus:ring-2 focus:ring-brand-accent/30"
                     />
                 </div>
 
                 {/* Error State */}
                 {showError && (
                     <div
-                        className="flex items-center gap-2 rounded-lg bg-red-50 p-3 text-sm text-red-600 dark:bg-red-950/50 dark:text-red-400">
+                        className="flex items-center gap-2 rounded-lg bg-amber-100 p-3 text-sm text-brand-deep">
                         <svg
                             className="h-4 w-4 shrink-0"
                             xmlns="http://www.w3.org/2000/svg"
@@ -60,7 +60,7 @@ export function LoginForm({action, showError = false}: LoginFormProps) {
                 {/* Submit Button */}
                 <button
                     type="submit"
-                    className="w-full rounded-lg bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-800 focus:outline-none focus:ring-2 focus:ring-zinc-950 focus:ring-offset-2 dark:bg-zinc-50 dark:text-zinc-900 dark:hover:bg-zinc-200 dark:focus:ring-zinc-300 dark:focus:ring-offset-zinc-950"
+                    className="btn-primary w-full rounded-lg px-4 py-2.5 text-sm font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-brand-accent/40"
                 >
                     Sign in
                 </button>

@@ -58,20 +58,20 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
   );
 
   return (
-    <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-8">
+    <main className="app-shell mx-auto flex w-full max-w-5xl flex-1 flex-col gap-6 px-4 py-8">
       <header className="flex flex-wrap items-center justify-between gap-3">
         <div className="flex items-center gap-3">
-          <Link href="/" className="rounded-md border border-zinc-300 px-3 py-2 text-sm">
+          <Link href="/" className="btn-outline rounded-md px-3 py-2 text-sm">
             Back
           </Link>
-          <h1 className="text-2xl font-bold">Schedule & Overrides</h1>
+          <h1 className="text-2xl font-bold text-brand-deep">Schedule & Overrides</h1>
         </div>
         <form action={logoutAction}>
-          <button className="rounded-md border border-zinc-300 px-3 py-2 text-sm">Sign out</button>
+          <button className="btn-outline rounded-md px-3 py-2 text-sm">Sign out</button>
         </form>
       </header>
 
-      <section className="rounded-xl border border-zinc-200 p-4">
+      <section className="card rounded-xl p-4">
         {params.ok ? (
           <p className="mb-3 rounded-md border border-green-300 bg-green-50 px-3 py-2 text-sm text-green-800">{params.ok}</p>
         ) : null}
@@ -80,17 +80,17 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
         ) : null}
 
         <h2 className="text-lg font-semibold">Auto-generate Assignments</h2>
-        <p className="mt-1 text-sm text-zinc-600">
+        <p className="mt-1 text-sm text-brand-muted">
           Window: {settings.assignmentWindowDays} days, {settings.assignmentsPerDay} assignment(s) per day.
         </p>
         <form action={generateScheduleAction} className="mt-3">
-          <button type="submit" className="rounded-md bg-zinc-900 px-4 py-2 text-sm font-semibold text-white">
+          <button type="submit" className="btn-primary rounded-md px-4 py-2 text-sm font-semibold">
             Generate / Fill Missing Slots
           </button>
         </form>
       </section>
 
-      <section className="rounded-xl border border-zinc-200 p-4">
+      <section className="card rounded-xl p-4">
         <h2 className="mb-3 text-lg font-semibold">Manual Override</h2>
         <form action={overrideAssignmentAction} className="grid gap-3 sm:grid-cols-2">
           <label className="space-y-1">
@@ -100,13 +100,13 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
               type="date"
               required
               defaultValue={toDateInputValue(new Date())}
-              className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm"
+              className="w-full rounded-md border border-brand-accent/50 bg-white px-3 py-2 text-sm focus:border-brand-accent focus:outline-none"
             />
           </label>
 
           <label className="space-y-1">
             <span className="text-sm font-medium">Slot</span>
-            <select name="slot" className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm">
+            <select name="slot" className="w-full rounded-md border border-brand-accent/50 bg-white px-3 py-2 text-sm focus:border-brand-accent focus:outline-none">
               {Array.from({ length: settings.assignmentsPerDay }).map((_, index) => (
                 <option key={index} value={index}>
                   Slot {index + 1}
@@ -117,7 +117,7 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
 
           <label className="space-y-1 sm:col-span-2">
             <span className="text-sm font-medium">Congregation</span>
-            <select name="congregationId" required className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm">
+            <select name="congregationId" required className="w-full rounded-md border border-brand-accent/50 bg-white px-3 py-2 text-sm focus:border-brand-accent focus:outline-none">
               <option value="">Select congregation</option>
               {congregations.map((congregation) => (
                 <option key={congregation.id} value={congregation.id}>
@@ -129,10 +129,10 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
 
           <label className="space-y-1 sm:col-span-2">
             <span className="text-sm font-medium">Notes (optional)</span>
-            <input name="notes" className="w-full rounded-md border border-zinc-300 px-3 py-2 text-sm" />
+            <input name="notes" className="w-full rounded-md border border-brand-accent/50 bg-white px-3 py-2 text-sm focus:border-brand-accent focus:outline-none" />
           </label>
 
-          <button type="submit" className="w-fit rounded-md bg-zinc-900 px-4 py-2 text-sm font-semibold text-white">
+          <button type="submit" className="btn-primary w-fit rounded-md px-4 py-2 text-sm font-semibold">
             Save Override
           </button>
         </form>
@@ -141,7 +141,7 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
       <section className="space-y-3">
         <h2 className="text-lg font-semibold">Upcoming Assignments</h2>
         {Array.from(grouped.entries()).map(([date, rows]) => (
-          <article key={date} className="rounded-xl border border-zinc-200 p-4">
+          <article key={date} className="card rounded-xl p-4">
             <h3 className="font-semibold">{formatDate(rows[0]?.date ?? new Date(date))}</h3>
             <div className="mt-2 space-y-1 text-sm">
               {rows.map((row) => (
@@ -169,7 +169,7 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
             | null;
 
           return (
-            <article key={event.id} className="rounded-xl border border-zinc-200 p-4 text-sm">
+            <article key={event.id} className="card rounded-xl p-4 text-sm">
               <p className="font-semibold">
                 {event.eventType} - {formatDate(new Date(event.createdAt))}
               </p>

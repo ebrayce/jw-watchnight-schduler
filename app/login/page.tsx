@@ -16,7 +16,7 @@ export default async function LoginPage({ searchParams }: LoginPageProps) {
   const showError = params.error === "invalid";
 
   return (
-    <main className="mx-auto flex min-h-screen w-full max-w-md items-center px-4">
+    <main className="app-shell mx-auto flex min-h-screen w-full items-center justify-center px-4">
       <LoginForm action={loginAction} showError={showError} />
     </main>
   );
