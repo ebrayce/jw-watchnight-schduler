@@ -33,6 +33,27 @@ function redirectWithStatus(path: string, params: { ok?: string; error?: string 
   redirect(`${path}?${search.toString()}`);
 }
 
+type CongregationDraft = {
+  name: string;
+  overseer: string;
+  contactPrimary: string;
+  contactAlternate: string;
+  meetingDays: number[];
+  isActive: boolean;
+};
+
+function redirectWithCreateDraft(error: string, draft: CongregationDraft): never {
+  const search = new URLSearchParams();
+  search.set("error", error);
+  search.set("draftName", draft.name);
+  search.set("draftOverseer", draft.overseer);
+  search.set("draftContactPrimary", draft.contactPrimary);
+  search.set("draftContactAlternate", draft.contactAlternate);
+  search.set("draftMeetingDays", draft.meetingDays.join(","));
+  search.set("draftIsActive", String(draft.isActive));
+  redirect(`/congregations?${search.toString()}`);
+}
+
 async function createAuditLog(eventType: string, details?: Prisma.InputJsonValue): Promise<void> {
   const headerStore = await headers();
   const forwardedFor = headerStore.get("x-forwarded-for");
@@ -66,6 +87,18 @@ export async function logoutAction(): Promise<void> {
 export async function createCongregationAction(formData: FormData): Promise<void> {
   await assertAdmin();
 
+  const draft: CongregationDraft = {
+    name: String(formData.get("name") ?? "").trim(),
+    overseer: String(formData.get("overseer") ?? "").trim(),
+    contactPrimary: String(formData.get("contactPrimary") ?? "").trim(),
+    contactAlternate: String(formData.get("contactAlternate") ?? "").trim(),
+    meetingDays: formData
+      .getAll("meetingDays")
+      .map((value) => Number.parseInt(String(value), 10))
+      .filter((value) => Number.isInteger(value) && value >= 0 && value <= 6),
+    isActive: formData.get("isActive") !== null,
+  };
+
   const input = parseFormData(formData);
   const parsed = congregationInputSchema.safeParse({
     ...input,
@@ -73,23 +106,20 @@ export async function createCongregationAction(formData: FormData): Promise<void
   });
 
   if (!parsed.success) {
-    redirectWithStatus("/congregations", {
-      error: parsed.error.issues[0]?.message ?? "Invalid congregation data.",
-    });
+    redirectWithCreateDraft(parsed.error.issues[0]?.message ?? "Invalid congregation data.", draft);
   }
 
   try {
     await prisma.congregation.create({
       data: parsed.data,
     });
-    revalidatePath("/congregations");
-    revalidatePath("/");
-    redirectWithStatus("/congregations", { ok: "Congregation created." });
   } catch {
-    redirectWithStatus("/congregations", {
-      error: "Could not create congregation. Name must be unique.",
-    });
+    redirectWithCreateDraft("Could not create congregation. Name must be unique.", draft);
   }
+
+  revalidatePath("/congregations");
+  revalidatePath("/");
+  redirectWithStatus("/congregations", { ok: "Congregation created." });
 }
 
 export async function updateCongregationAction(formData: FormData): Promise<void> {
@@ -117,11 +147,12 @@ export async function updateCongregationAction(formData: FormData): Promise<void
       where: { id },
       data: parsed.data,
     });
-    revalidatePath("/congregations");
-    redirectWithStatus("/congregations", { ok: "Congregation updated." });
   } catch {
     redirectWithStatus("/congregations", { error: "Could not update congregation." });
   }
+
+  revalidatePath("/congregations");
+  redirectWithStatus("/congregations", { ok: "Congregation updated." });
 }
 
 export async function deleteCongregationAction(formData: FormData): Promise<void> {
@@ -131,6 +162,8 @@ export async function deleteCongregationAction(formData: FormData): Promise<void
   if (!id) {
     redirectWithStatus("/congregations", { error: "Missing congregation id." });
   }
+
+  let successMessage = "Congregation deleted.";
 
   try {
     const assignmentCount = await prisma.assignment.count({
@@ -143,22 +176,19 @@ export async function deleteCongregationAction(formData: FormData): Promise<void
         data: { isActive: false },
       });
 
-      revalidatePath("/congregations");
-      revalidatePath("/schedule");
-      redirectWithStatus("/congregations", {
-        ok: `Congregation archived (inactive). It has ${assignmentCount} linked assignment(s), so it was not hard-deleted.`,
-      });
+      successMessage = `Congregation archived (inactive). It has ${assignmentCount} linked assignment(s), so it was not hard-deleted.`;
+    } else {
+      await prisma.congregation.delete({ where: { id } });
     }
-
-    await prisma.congregation.delete({ where: { id } });
-    revalidatePath("/congregations");
-    revalidatePath("/schedule");
-    redirectWithStatus("/congregations", { ok: "Congregation deleted." });
   } catch {
     redirectWithStatus("/congregations", {
       error: "Could not delete congregation. Ensure no assignment references it.",
     });
   }
+
+  revalidatePath("/congregations");
+  revalidatePath("/schedule");
+  redirectWithStatus("/congregations", { ok: successMessage });
 }
 
 function parseCsvBoolean(value: string): boolean {
@@ -319,6 +349,25 @@ export async function generateScheduleAction(): Promise<void> {
 
   redirectWithStatus("/schedule", {
     ok: `Removed ${result.removed} previous auto assignment(s). Generated ${result.created} assignment(s).`,
+  });
+}
+
+export async function clearScheduleAction(): Promise<void> {
+  await assertAdmin();
+
+  // Execute a completely unrestricted delete transaction across the table
+  const removed = await prisma.assignment.deleteMany({});
+
+  // Audit that a full structural wipe was initiated by an administrator
+  await createAuditLog("SCHEDULE_CLEARED", {
+    removed: removed.count,
+    scope: "ALL_RECORDS",
+    timestamp: new Date().toISOString(),
+  });
+
+  revalidatePath("/schedule");
+  redirectWithStatus("/schedule", {
+    ok: `Successfully wiped all ${removed.count} assignment record(s) from the system directory.`,
   });
 }
 

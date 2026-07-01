@@ -117,6 +117,14 @@ Runs the pure scheduler engine without DB writes:
 pnpm scheduler:smoke
 ```
 
+### Congregation Create Smoke Test
+
+Validates that a congregation can be created and then cleaned up:
+
+```bash
+pnpm congregation:create-smoke
+```
+
 ## Security Notes
 
 - Passwords are verified using `scrypt` and timing-safe comparison

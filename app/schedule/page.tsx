@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { generateScheduleAction, logoutAction, overrideAssignmentAction } from "@/app/actions";
+import { clearScheduleAction, generateScheduleAction, logoutAction, overrideAssignmentAction } from "@/app/actions";
 import { StatusBanner } from "@/components/status-banner";
 import { dayLabels, formatDateKey, toDateInputValue } from "@/lib/dates";
 import { requireAdmin } from "@/lib/guards";
@@ -36,7 +36,7 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
     prisma.auditLog.findMany({
       where: {
         eventType: {
-          in: ["SCHEDULE_GENERATED", "ASSIGNMENT_MANUAL_OVERRIDE"],
+          in: ["SCHEDULE_GENERATED", "ASSIGNMENT_MANUAL_OVERRIDE", "SCHEDULE_CLEARED"],
         },
       },
       orderBy: { createdAt: "desc" },
@@ -108,6 +108,11 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
               <form action={generateScheduleAction}>
                 <button type="submit" className="ui-btn w-full py-2.5 text-xs font-bold cursor-pointer shadow-md shadow-[var(--primary)]/10">
                   Generate / Fill Missing Slots
+                </button>
+              </form>
+              <form action={clearScheduleAction}>
+                <button type="submit" className="ui-btn-secondary w-full py-2.5 text-xs font-bold cursor-pointer">
+                  Clear Schedule (Today+)
                 </button>
               </form>
             </section>
@@ -235,23 +240,35 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
                   auditLogs.map((event) => {
                     const details = event.details as {
                       created?: number;
+                      removed?: number;
+                      fromDate?: string;
                       conflicts?: Array<{ date: string; slot: number; reason: string }>;
                       slot?: number;
                       date?: string;
                     } | null;
 
-                    const isOverride = event.eventType !== "SCHEDULE_GENERATED";
+                    const isGenerated = event.eventType === "SCHEDULE_GENERATED";
+                    const isCleared = event.eventType === "SCHEDULE_CLEARED";
 
                     return (
                       <article key={event.id} className="ui-card p-4 text-xs flex items-start justify-between gap-4">
                         <div className="space-y-1">
                           <p className="font-bold ui-title">
-                            {event.eventType === "SCHEDULE_GENERATED" ? "⚙️ SYSTEM_BATCH_GENERATE" : "✍️ MANUAL_OVERRIDE_APPLIED"}
+                            {isGenerated
+                              ? "⚙️ SYSTEM_BATCH_GENERATE"
+                              : isCleared
+                                ? "🧹 SCHEDULE_CLEARED"
+                                : "✍️ MANUAL_OVERRIDE_APPLIED"}
                           </p>
-                          {!isOverride ? (
+                          {isGenerated ? (
                             <p className="ui-subtle">
                               Created <span className="font-semibold ui-title">{details?.created ?? 0}</span> new matching data instances
                               {details?.conflicts?.length ? ` • detected structural timeline context breaks: ${details.conflicts.length}` : ""}.
+                            </p>
+                          ) : isCleared ? (
+                            <p className="ui-subtle">
+                              Cleared <span className="font-semibold ui-title">{details?.removed ?? 0}</span> assignment(s)
+                              from <span className="font-semibold ui-title">{details?.fromDate?.slice(0, 10) ?? "today"}</span> onward.
                             </p>
                           ) : (
                             <p className="ui-subtle">

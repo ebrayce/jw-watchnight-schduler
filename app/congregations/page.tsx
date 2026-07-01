@@ -42,7 +42,18 @@ function MeetingDayPicker({ selected, inputName }: { selected: number[]; inputNa
 }
 
 type CongregationsPageProps = {
-  searchParams: Promise<{ ok?: string; error?: string; q?: string; page?: string }>;
+  searchParams: Promise<{
+    ok?: string;
+    error?: string;
+    q?: string;
+    page?: string;
+    draftName?: string;
+    draftOverseer?: string;
+    draftContactPrimary?: string;
+    draftContactAlternate?: string;
+    draftMeetingDays?: string;
+    draftIsActive?: string;
+  }>;
 };
 
 export default async function CongregationsPage({ searchParams }: CongregationsPageProps) {
@@ -85,6 +96,11 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
     return `/congregations?${query.toString()}`;
   };
 
+  const draftMeetingDays = (params.draftMeetingDays ?? "")
+    .split(",")
+    .map((value) => Number.parseInt(value, 10))
+    .filter((value) => Number.isInteger(value) && value >= 0 && value <= 6);
+
   return (
     <main className="app-shell w-full min-h-screen">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 space-y-6">
@@ -126,19 +142,47 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
               <h2 className="text-base font-bold ui-title mb-4">Add New Congregation</h2>
               <form action={createCongregationAction} className="space-y-4">
                 <div className="space-y-3">
-                  <input name="name" required placeholder="Congregation Name" className="ui-input text-sm" />
-                  <input name="overseer" required placeholder="Overseer Name" className="ui-input text-sm" />
-                  <input name="contactPrimary" required placeholder="Primary Contact Phone" className="ui-input text-sm" />
-                  <input name="contactAlternate" placeholder="Alternative Contact (Optional)" className="ui-input text-sm" />
+                  <input
+                    name="name"
+                    required
+                    placeholder="Congregation Name"
+                    className="ui-input text-sm"
+                    defaultValue={params.draftName ?? ""}
+                  />
+                  <input
+                    name="overseer"
+                    required
+                    placeholder="Overseer Name"
+                    className="ui-input text-sm"
+                    defaultValue={params.draftOverseer ?? ""}
+                  />
+                  <input
+                    name="contactPrimary"
+                    required
+                    placeholder="Primary Contact Phone"
+                    className="ui-input text-sm"
+                    defaultValue={params.draftContactPrimary ?? ""}
+                  />
+                  <input
+                    name="contactAlternate"
+                    placeholder="Alternative Contact (Optional)"
+                    className="ui-input text-sm"
+                    defaultValue={params.draftContactAlternate ?? ""}
+                  />
                 </div>
 
                 <div className="space-y-1.5">
                   <p className="text-xs font-semibold uppercase tracking-wider ui-subtle pl-0.5">Meeting Days</p>
-                  <MeetingDayPicker selected={[]} inputName="meetingDays" />
+                  <MeetingDayPicker selected={draftMeetingDays} inputName="meetingDays" />
                 </div>
 
                 <label className="flex items-center gap-2 text-sm font-medium cursor-pointer py-1 ui-title">
-                  <input type="checkbox" name="isActive" defaultChecked className="rounded border-[var(--border)] bg-[var(--surface-strong)] text-[var(--primary)] focus:ring-[var(--primary)]/20" />
+                  <input
+                    type="checkbox"
+                    name="isActive"
+                    defaultChecked={params.draftIsActive ? params.draftIsActive === "true" : true}
+                    className="rounded border-[var(--border)] bg-[var(--surface-strong)] text-[var(--primary)] focus:ring-[var(--primary)]/20"
+                  />
                   Active Listing
                 </label>
 
