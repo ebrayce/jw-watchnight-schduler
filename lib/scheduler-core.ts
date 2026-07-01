@@ -17,6 +17,33 @@ export type CongregationWithAssignments = Pick<Congregation, "id" | "meetingDays
   assignments: Pick<Assignment, "date">[];
 };
 
+interface ConflictParams {
+  date: Date;
+  candidates: CongregationWithAssignments[];
+  avoidConsecutiveDays: boolean;
+}
+
+interface ScoreRecord {
+  congregation: CongregationWithAssignments;
+  weekCount: number;
+  totalCount: number;
+}
+
+interface PlanParams {
+  startDate: Date;
+  days: number;
+  assignmentsPerDay: number;
+  weekStartsOn: number;
+  avoidConsecutiveDays: boolean;
+  congregations: CongregationWithAssignments[];
+}
+
+interface PlanResult {
+  plan: AssignmentPlanItem[];
+  unassignedDates: string[];
+  conflicts: AssignmentConflict[];
+}
+
 function startOfDay(input: Date): Date {
   const date = new Date(input);
   date.setHours(0, 0, 0, 0);
@@ -52,11 +79,7 @@ function randomIndex(max: number): number {
   return Math.floor(Math.random() * max);
 }
 
-function getConflictReason(params: {
-  date: Date;
-  candidates: CongregationWithAssignments[];
-  avoidConsecutiveDays: boolean;
-}): string {
+function getConflictReason(params: ConflictParams): string {
   const { date, candidates, avoidConsecutiveDays } = params;
   const dayOfWeek = date.getDay();
   const previousDay = formatDateKey(addDays(date, -1));
@@ -144,7 +167,7 @@ function selectCongregation(
     (congregation) => (plannedCounts.get(congregation.id) ?? 0) === minPlannedCount,
   );
 
-  const withScores = fairnessPool.map((congregation) => {
+  const withScores = fairnessPool.map((congregation): ScoreRecord => {
     const weekCounts = countAssignmentsByWeek(congregation.assignments, weekStartsOn);
     return {
       congregation,
@@ -169,14 +192,7 @@ function selectCongregation(
   return pool[randomIndex(pool.length)] ?? null;
 }
 
-export function buildAssignmentPlan(params: {
-  startDate: Date;
-  days: number;
-  assignmentsPerDay: number;
-  weekStartsOn: number;
-  avoidConsecutiveDays: boolean;
-  congregations: CongregationWithAssignments[];
-}): { plan: AssignmentPlanItem[]; unassignedDates: string[]; conflicts: AssignmentConflict[] } {
+export function buildAssignmentPlan(params: PlanParams): PlanResult {
   const { startDate, days, assignmentsPerDay, weekStartsOn, avoidConsecutiveDays, congregations } = params;
 
   const plan: AssignmentPlanItem[] = [];
@@ -184,7 +200,13 @@ export function buildAssignmentPlan(params: {
   const conflicts: AssignmentConflict[] = [];
   const plannedCounts = new Map<string, number>();
 
-  for (const congregation of congregations) {
+  // Clone assignment tracking so planner does not mutate caller-owned arrays.
+  const dynamicCongregations: CongregationWithAssignments[] = congregations.map((congregation) => ({
+    ...congregation,
+    assignments: [...congregation.assignments],
+  }));
+
+  for (const congregation of dynamicCongregations) {
     plannedCounts.set(congregation.id, 0);
   }
 
@@ -199,7 +221,7 @@ export function buildAssignmentPlan(params: {
           .map((item) => item.congregationId),
       );
 
-      const availableCongregations = congregations.filter(
+      const availableCongregations = dynamicCongregations.filter(
         (congregation) => !alreadyAssignedIds.has(congregation.id),
       );
 
