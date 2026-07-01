@@ -1,24 +1,64 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f8f7;
-  --foreground: #1e152a;
+  /* ========================================== */
+  /* LIGHT MODE (Palette 1: Modern Cool)        */
+  /* ========================================== */
+  --background: #F8FAFC;     /* Clean, premium slate tint */
+  --foreground: #0F172A;     /* Rich slate navy text */
 
-  /* Light Mode Structural Tokens */
-  --brand-deep: #1e152a;
-  --brand-muted: #122e2d;
-  --brand-accent: #5ab1bb;
-  --brand-soft: #a5c882;
-  --brand-warm: #f7dd72;
+  /* Structural Brand Tokens */
+  --brand-deep: #1E152A;     /* Deep signature purple-black */
+  --brand-muted: #64748B;    /* Muted slate grey for comfortable reading */
+  --brand-accent: #0EA5E9;   /* Crisp modern cyan/teal action color */
+  --brand-soft: #10B981;     /* Safe, solid emerald green */
+  --brand-warm: #F59E0B;     /* Amber warning accent */
 
-  /* Component Blend Bases (Light Mode) */
-  --card-bg-base: white;
-  --btn-primary-bg: var(--brand-deep);
-  --btn-primary-text: white;
-  --btn-outline-text: var(--brand-deep);
-  --btn-outline-bg-base: white;
+  /* Structural Component Blends */
+  --card-bg-base: #FFFFFF;
+  --input-bg: #FFFFFF;
+  --input-border: #E2E8F0;
+
+  --btn-primary-bg: var(--brand-accent);
+  --btn-primary-text: #FFFFFF;
+  --btn-primary-hover-mix: #000000; /* Darkens on hover */
+
+  --btn-outline-text: var(--brand-accent);
+  --btn-outline-bg-base: #FFFFFF;
+  --btn-outline-border: var(--brand-accent);
 }
 
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* ========================================== */
+    /* DARK MODE (Palette 2: Deep Berry Dark)     */
+    /* ========================================== */
+    --background: #171219;   /* Vampire Black */
+    --foreground: #F4F6F5;   /* Crisp off-white */
+
+    /* Structural Brand Tokens */
+    --brand-deep: #F4F6F5;   /* Elements shift to clean light text */
+    --brand-muted: #225560;  /* Sophisticated deep teal for low-contrast labels */
+    --brand-accent: #F0803C; /* Mango Tango Orange primary action */
+    --brand-soft: #A5C882;   /* Soft sage green */
+    --brand-warm: #EDF060;   /* High-visibility Laser Lemon yellow */
+
+    /* Structural Component Blends */
+    --card-bg-base: #1F1722; /* Deep violet-plum card layer */
+    --input-bg: #171219;     /* Inset dark field well */
+    --input-border: #2C2230;
+
+    --btn-primary-bg: var(--brand-accent);
+    --btn-primary-text: #171219; /* Keeps text deep black over vibrant orange */
+    --btn-primary-hover-mix: #FFFFFF; /* Lightens slightly on hover */
+
+    --btn-outline-text: var(--brand-warm);
+    --btn-outline-bg-base: #1F1722;
+    --btn-outline-border: var(--brand-muted);
+  }
+}
+
+/* Inline theme registration for Tailwind v4 utility compiler */
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -31,59 +71,51 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #171219;   /* Vampire Black */
-    --foreground: #f4f6f5;   /* Crisp Off-White */
-
-    /* Dark Mode Structural Tokens mapped to your new palette */
-    --brand-deep: #f4f6f5;
-    --brand-muted: #225560;  /* Deep Teal for muted layout pieces */
-    --brand-accent: #F0803C; /* Mango Tango Orange */
-    --brand-soft: #225560;
-    --brand-warm: #EDF060;   /* Laser Lemon Yellow */
-
-    /* Component Blend Bases (Dark Mode) */
-    --card-bg-base: #310D20; /* Deep Plum background for cards */
-    --btn-primary-bg: #F0803C; /* Buttons use the vibrant orange */
-    --btn-primary-text: #171219; /* Text remains dark on light background */
-    --btn-outline-text: #EDF060; /* Outline buttons pop with lemon yellow */
-    --btn-outline-bg-base: #310D20;
-  }
-}
-
+/* Global Styles */
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
-  transition: background-color 0.3s, color 0.3s;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Gradients update smoothly using the glowing orange and yellow accents in dark mode */
+/* Layout Elements */
 .app-shell {
-  background: radial-gradient(circle at top right, color-mix(in srgb, var(--brand-accent) 12%, transparent), transparent 45%),
-  radial-gradient(circle at top left, color-mix(in srgb, var(--brand-warm) 10%, transparent), transparent 35%), var(--background);
+  background:
+          radial-gradient(circle at top right, color-mix(in srgb, var(--brand-accent) 12%, transparent), transparent 45%),
+          radial-gradient(circle at top left, color-mix(in srgb, var(--brand-warm) 10%, transparent), transparent 35%),
+          var(--background);
 }
 
 .card {
-  border: 1px solid color-mix(in srgb, var(--foreground) 10%, transparent);
-  background: color-mix(in srgb, var(--card-bg-base) 95%, var(--brand-accent) 5%);
+  border: 1px solid color-mix(in srgb, var(--foreground) 8%, transparent);
+  background: color-mix(in srgb, var(--card-bg-base) 96%, var(--brand-accent) 4%);
+  box-shadow: 0 10px 25px -5px color-mix(in srgb, var(--foreground) 4%, transparent);
 }
 
+/* Button UI Components */
 .btn-primary {
-  background: var(--btn-primary-bg);
+  background-color: var(--btn-primary-bg);
   color: var(--btn-primary-text);
   font-weight: 600;
-  transition: all 0.2s ease;
+  border-radius: 0.75rem;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .btn-primary:hover {
-  background: color-mix(in srgb, var(--btn-primary-bg) 85%, white 15%);
+  /* Dynamically modifies brightness without breaking contrast barriers across themes */
+  background-color: color-mix(in srgb, var(--btn-primary-bg) 88%, var(--btn-primary-hover-mix) 12%);
 }
 
 .btn-outline {
-  border: 1px solid color-mix(in srgb, var(--brand-accent) 40%, transparent);
+  border: 1px solid color-mix(in srgb, var(--btn-outline-border) 40%, transparent);
   color: var(--btn-outline-text);
-  background: color-mix(in srgb, var(--btn-outline-bg-base) 90%, var(--brand-warm) 10%);
+  background-color: color-mix(in srgb, var(--btn-outline-bg-base) 92%, var(--brand-warm) 8%);
+  font-weight: 500;
+  border-radius: 0.75rem;
   transition: all 0.2s ease;
+}
+
+.btn-outline:hover {
+  background-color: color-mix(in srgb, var(--btn-outline-bg-base) 80%, var(--brand-warm) 20%);
 }
