@@ -7,6 +7,8 @@ import {
   logoutAction,
   updateCongregationAction,
 } from "@/app/actions";
+import { CreateCongregationModal } from "@/components/create-congregation-modal";
+import { LiveSearch } from "@/components/live-search";
 import { StatusBanner } from "@/components/status-banner";
 import { dayLabels } from "@/lib/dates";
 import { requireAdmin } from "@/lib/guards";
@@ -101,6 +103,15 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
     .map((value) => Number.parseInt(value, 10))
     .filter((value) => Number.isInteger(value) && value >= 0 && value <= 6);
 
+  const createDraft = {
+    name: params.draftName ?? "",
+    overseer: params.draftOverseer ?? "",
+    contactPrimary: params.draftContactPrimary ?? "",
+    contactAlternate: params.draftContactAlternate ?? "",
+    meetingDays: draftMeetingDays,
+    isActive: params.draftIsActive ? params.draftIsActive === "true" : true,
+  };
+
   return (
     <main className="app-shell w-full min-h-screen">
       <div className="mx-auto w-full max-w-7xl px-4 py-8 space-y-6">
@@ -138,58 +149,14 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
           <div className="space-y-6 lg:col-span-1">
 
             {/* Panel: Write Registry */}
-            <section className="ui-card p-6">
-              <h2 className="text-base font-bold ui-title mb-4">Add New Congregation</h2>
-              <form action={createCongregationAction} className="space-y-4">
-                <div className="space-y-3">
-                  <input
-                    name="name"
-                    required
-                    placeholder="Congregation Name"
-                    className="ui-input text-sm"
-                    defaultValue={params.draftName ?? ""}
-                  />
-                  <input
-                    name="overseer"
-                    required
-                    placeholder="Overseer Name"
-                    className="ui-input text-sm"
-                    defaultValue={params.draftOverseer ?? ""}
-                  />
-                  <input
-                    name="contactPrimary"
-                    required
-                    placeholder="Primary Contact Phone"
-                    className="ui-input text-sm"
-                    defaultValue={params.draftContactPrimary ?? ""}
-                  />
-                  <input
-                    name="contactAlternate"
-                    placeholder="Alternative Contact (Optional)"
-                    className="ui-input text-sm"
-                    defaultValue={params.draftContactAlternate ?? ""}
-                  />
-                </div>
-
-                <div className="space-y-1.5">
-                  <p className="text-xs font-semibold uppercase tracking-wider ui-subtle pl-0.5">Meeting Days</p>
-                  <MeetingDayPicker selected={draftMeetingDays} inputName="meetingDays" />
-                </div>
-
-                <label className="flex items-center gap-2 text-sm font-medium cursor-pointer py-1 ui-title">
-                  <input
-                    type="checkbox"
-                    name="isActive"
-                    defaultChecked={params.draftIsActive ? params.draftIsActive === "true" : true}
-                    className="rounded border-[var(--border)] bg-[var(--surface-strong)] text-[var(--primary)] focus:ring-[var(--primary)]/20"
-                  />
-                  Active Listing
-                </label>
-
-                <button type="submit" className="ui-btn w-full py-2.5 text-sm font-semibold cursor-pointer shadow-md shadow-[var(--primary)]/10">
-                  Add Congregation
-                </button>
-              </form>
+            <section className="ui-card p-6 space-y-3">
+              <h2 className="text-base font-bold ui-title">Add New Congregation</h2>
+              <p className="text-xs ui-subtle">Opens a focused modal form to create a congregation record.</p>
+              <CreateCongregationModal
+                action={createCongregationAction}
+                draft={createDraft}
+                startOpen={Boolean(params.error && (params.draftName || params.draftOverseer || params.draftContactPrimary))}
+              />
             </section>
 
             {/* Panel: Bulk Processing */}
@@ -227,28 +194,19 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
           {/* MAIN RECORD VIEWS */}
           <section className="lg:col-span-2 space-y-4">
             <div className="ui-card p-4">
-              <form className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" action="/congregations" method="get">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex-1">
                   <label htmlFor="q" className="mb-1 block text-[11px] font-semibold uppercase tracking-wider ui-subtle">
                     Search Congregations
                   </label>
-                  <input
-                    id="q"
-                    name="q"
-                    defaultValue={searchQuery}
-                    placeholder="Name, overseer, or contact"
-                    className="ui-input text-sm"
-                  />
+                  <LiveSearch initialQuery={searchQuery} placeholder="Name, overseer, or contact" />
                 </div>
                 <div className="flex items-end gap-2">
-                  <button type="submit" className="ui-btn px-4 py-2 text-sm font-semibold">
-                    Search
-                  </button>
                   <Link href="/congregations" className="ui-btn-secondary px-4 py-2 text-sm font-semibold">
                     Reset
                   </Link>
                 </div>
-              </form>
+              </div>
               <div className="mt-3 flex items-center justify-between px-1">
                 <h2 className="text-base font-bold ui-title">Congregations ({totalCount})</h2>
                 <span className="text-xs ui-subtle">
