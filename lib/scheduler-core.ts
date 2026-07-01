@@ -107,6 +107,7 @@ function selectCongregation(
   congregations: CongregationWithAssignments[],
   weekStartsOn: number,
   avoidConsecutiveDays: boolean,
+  plannedCounts: Map<string, number>,
 ): CongregationWithAssignments | null {
   const dayOfWeek = date.getDay();
   const currentWeek = weekId(date, weekStartsOn);
@@ -137,7 +138,13 @@ function selectCongregation(
     return null;
   }
 
-  const withScores = eligible.map((congregation) => {
+  // Fairness rule: prioritize congregations with the fewest assignments in this generated window.
+  const minPlannedCount = Math.min(...eligible.map((congregation) => plannedCounts.get(congregation.id) ?? 0));
+  const fairnessPool = eligible.filter(
+    (congregation) => (plannedCounts.get(congregation.id) ?? 0) === minPlannedCount,
+  );
+
+  const withScores = fairnessPool.map((congregation) => {
     const weekCounts = countAssignmentsByWeek(congregation.assignments, weekStartsOn);
     return {
       congregation,
@@ -175,6 +182,11 @@ export function buildAssignmentPlan(params: {
   const plan: AssignmentPlanItem[] = [];
   const unassignedDates: string[] = [];
   const conflicts: AssignmentConflict[] = [];
+  const plannedCounts = new Map<string, number>();
+
+  for (const congregation of congregations) {
+    plannedCounts.set(congregation.id, 0);
+  }
 
   for (let offset = 0; offset < days; offset += 1) {
     const date = startOfDay(addDays(startDate, offset));
@@ -191,7 +203,13 @@ export function buildAssignmentPlan(params: {
         (congregation) => !alreadyAssignedIds.has(congregation.id),
       );
 
-      const selected = selectCongregation(date, availableCongregations, weekStartsOn, avoidConsecutiveDays);
+      const selected = selectCongregation(
+        date,
+        availableCongregations,
+        weekStartsOn,
+        avoidConsecutiveDays,
+        plannedCounts,
+      );
       if (!selected) {
         conflicts.push({
           date: formatDateKey(date),
@@ -202,6 +220,7 @@ export function buildAssignmentPlan(params: {
       }
 
       selected.assignments.push({ date });
+      plannedCounts.set(selected.id, (plannedCounts.get(selected.id) ?? 0) + 1);
       plan.push({
         date,
         slot,
