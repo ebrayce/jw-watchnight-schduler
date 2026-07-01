@@ -34,6 +34,12 @@ pnpm install
 pnpm auth:hash "change-me"
 ```
 
+Example output format:
+
+`<saltHex>:<hashHex>`
+
+Copy that full value into `ADMIN_PASSWORD_HASH` in `.env.local`.
+
 3. Create env file and fill secrets
 
 ```bash
@@ -45,6 +51,18 @@ Required env vars in `.env.local`:
 - `DATABASE_URL`
 - `SESSION_SECRET` (32+ random chars)
 - `ADMIN_PASSWORD_HASH` (`saltHex:hashHex`)
+
+Generate a secure `SESSION_SECRET` (recommended):
+
+```bash
+node -e "console.log(require('node:crypto').randomBytes(48).toString('base64url'))"
+```
+
+Set `ADMIN_PASSWORD_HASH` using the generated hash:
+
+```dotenv
+ADMIN_PASSWORD_HASH="paste-output-from-pnpm-auth-hash"
+```
 
 4. Generate Prisma client and run migration
 
@@ -82,3 +100,38 @@ pnpm scheduler:smoke
 - Passwords are verified using `scrypt` and timing-safe comparison
 - Session cookies are `httpOnly`, `sameSite=strict`, and `secure` in production
 - Input validation is enforced with Zod in all write actions
+
+## Troubleshooting
+
+### Error: `SESSION_SECRET` too small (Zod)
+
+If you see an error like:
+
+`Too small: expected string to have >=32 characters`
+
+update `SESSION_SECRET` in `.env.local` to a value with at least 32 characters.
+
+Example:
+
+```dotenv
+SESSION_SECRET="replace-with-very-long-random-secret-value"
+```
+
+### Error: invalid `ADMIN_PASSWORD_HASH` format
+
+If you see an error like this in env validation:
+
+`ADMIN_PASSWORD_HASH` must match `saltHex:hashHex`
+
+generate a fresh hash and copy it exactly:
+
+```bash
+pnpm auth:hash "your-admin-password"
+```
+
+Then set it in `.env.local`:
+
+```dotenv
+ADMIN_PASSWORD_HASH="<saltHex>:<hashHex>"
+```
+
