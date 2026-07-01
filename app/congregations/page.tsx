@@ -18,13 +18,13 @@ const weekdays = [0, 1, 2, 3, 4, 5, 6] as const;
 
 function MeetingDayPicker({ selected, inputName }: { selected: number[]; inputName: string }) {
   return (
-    <div className="grid grid-cols-4 gap-1.5 rounded-xl border border-(--border) bg-(--surface-strong) p-1.5 backdrop-blur-sm">
+    <div className="grid grid-cols-4 gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface-strong)] p-1.5 backdrop-blur-sm">
       {weekdays.map((day) => {
         const isChecked = selected.includes(day);
         return (
           <label
             key={`${inputName}-${day}`}
-            className="flex flex-col items-center justify-center rounded-lg border border-transparent p-2 text-center transition-all has-checked:border-(--primary)/30 has-[:checked]:bg-[var(--background)] cursor-pointer"
+            className="flex flex-col items-center justify-center rounded-lg border border-transparent p-2 text-center transition-all has-[:checked]:border-[var(--primary)]/30 has-[:checked]:bg-[var(--background)] cursor-pointer"
           >
             <input
               type="checkbox"
@@ -69,13 +69,13 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
 
   const where: Prisma.CongregationWhereInput = searchQuery
     ? {
-        OR: [
-          { name: { contains: searchQuery, mode: "insensitive" } },
-          { overseer: { contains: searchQuery, mode: "insensitive" } },
-          { contactPrimary: { contains: searchQuery, mode: "insensitive" } },
-          { contactAlternate: { contains: searchQuery, mode: "insensitive" } },
-        ],
-      }
+      OR: [
+        { name: { contains: searchQuery, mode: "insensitive" } },
+        { overseer: { contains: searchQuery, mode: "insensitive" } },
+        { contactPrimary: { contains: searchQuery, mode: "insensitive" } },
+        { contactAlternate: { contains: searchQuery, mode: "insensitive" } },
+      ],
+    }
     : {};
 
   const totalCount = await prisma.congregation.count({ where });
@@ -137,8 +137,8 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
         </header>
 
         {/* System Notification Banners */}
-        {params.ok ? <StatusBanner type="success" message={params.ok} /> : null}
-        {params.error ? <StatusBanner type="error" message={params.error} /> : null}
+        {params.ok && <StatusBanner type="success" message={params.ok} />}
+        {params.error && <StatusBanner type="error" message={params.error} />}
 
         {/* ========================================== */}
         {/* 2. PERSISTENT GRID ARCHITECTURE            */}
@@ -167,7 +167,7 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
               </div>
 
               <form action={importCongregationsCsvAction} className="space-y-2 pt-2 border-t border-[var(--border)]">
-                <label className="block text-xs font-semibold ui-subtle uppercase">Import via CSV</label>
+                <label className="block text-xs font-semibold ui-subtle uppercase tracking-wider pl-0.5">Import via CSV</label>
                 <input
                   type="file"
                   name="csvFile"
@@ -193,42 +193,45 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
 
           {/* MAIN RECORD VIEWS */}
           <section className="lg:col-span-2 space-y-4">
-            <div className="ui-card p-4">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex-1">
-                  <label htmlFor="q" className="mb-1 block text-[11px] font-semibold uppercase tracking-wider ui-subtle">
+
+            {/* Search Filter Header Card */}
+            <div className="ui-card p-5">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+                <div className="flex-1 space-y-1.5">
+                  <label htmlFor="q" className="block text-[10px] font-bold uppercase tracking-wider ui-subtle pl-0.5">
                     Search Congregations
                   </label>
-                  <LiveSearch initialQuery={searchQuery} placeholder="Name, overseer, or contact" />
+                  <LiveSearch initialQuery={searchQuery} placeholder="Search by name, overseer, or phone numbers..." />
                 </div>
-                <div className="flex items-end gap-2">
-                  <Link href="/congregations" className="ui-btn-secondary px-4 py-2 text-sm font-semibold">
-                    Reset
+                {searchQuery && (
+                  <Link href="/congregations" className="ui-btn-secondary px-5 h-[40px] flex items-center justify-center text-sm font-semibold hover:bg-[var(--background)] transition-all">
+                    Reset Filter
                   </Link>
-                </div>
+                )}
               </div>
-              <div className="mt-3 flex items-center justify-between px-1">
-                <h2 className="text-base font-bold ui-title">Congregations ({totalCount})</h2>
-                <span className="text-xs ui-subtle">
+              <div className="mt-4 flex items-center justify-between border-t border-[var(--border)] pt-3 px-0.5">
+                <h2 className="text-sm font-bold ui-title">Active Directory ({totalCount})</h2>
+                <span className="text-xs ui-subtle font-medium">
                   Page {currentPage} of {totalPages}
                 </span>
               </div>
             </div>
 
+            {/* List Stream */}
             {congregations.length === 0 ? (
               <div className="ui-card p-12 text-center text-sm ui-subtle">
-                No matching records found. Adjust your search or add a new congregation.
+                No matching records found. Adjust your search parameters or add a new congregation asset.
               </div>
             ) : (
               congregations.map((congregation) => (
-                <article key={congregation.id} className="ui-card p-6 transition-all hover:border-zinc-400/30 dark:hover:border-zinc-500/30 shadow-sm">
+                <article key={congregation.id} className="ui-card p-6 transition-all hover:border-zinc-400/20 dark:hover:border-zinc-500/20 shadow-sm">
                   <form action={updateCongregationAction} className="space-y-4">
                     <input type="hidden" name="id" value={congregation.id} />
 
                     {/* Uniform Responsive Forms Grid */}
                     <div className="grid gap-3 sm:grid-cols-2">
                       <div className="space-y-1">
-                        <span className="text-[10px] uppercase font-bold tracking-wider ui-subtle block pl-1"> Name</span>
+                        <span className="text-[10px] uppercase font-bold tracking-wider ui-subtle block pl-1">Congregation Name</span>
                         <input name="name" required defaultValue={congregation.name} className="ui-input text-sm font-semibold" />
                       </div>
                       <div className="space-y-1">
@@ -253,7 +256,7 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
 
                     {/* Footer Utility Actions */}
                     <div className="flex items-center justify-between border-t border-[var(--border)] pt-3 mt-2">
-                      <label className="flex items-center gap-2 text-xs font-semibold ui-subtle cursor-pointer">
+                      <label className="flex items-center gap-2 text-xs font-semibold ui-subtle cursor-pointer select-none">
                         <input type="checkbox" name="isActive" defaultChecked={congregation.isActive} className="rounded border-[var(--border)] bg-[var(--surface-strong)] text-[var(--primary)] focus:ring-[var(--primary)]/10" />
                         Active Status
                       </label>
@@ -264,7 +267,7 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
                           formAction={deleteCongregationAction}
                           className="text-xs font-bold text-red-500 hover:text-red-600 transition-colors px-3 py-2 rounded-xl hover:bg-red-500/10 cursor-pointer"
                         >
-                          Remove Cong
+                          Remove Unit
                         </button>
                         <button type="submit" className="ui-btn px-6 py-2 text-xs font-semibold cursor-pointer shadow-md shadow-[var(--primary)]/5">
                           Save Changes
@@ -276,17 +279,18 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
               ))
             )}
 
-            <div className="flex items-center justify-between px-2">
+            {/* Pagination Controls */}
+            <div className="flex items-center justify-between pt-2 px-1">
               <Link
                 href={makePageHref(Math.max(1, currentPage - 1))}
                 aria-disabled={currentPage <= 1}
-                className={`ui-btn-secondary px-4 py-2 text-sm font-semibold ${
-                  currentPage <= 1 ? "pointer-events-none opacity-50" : ""
+                className={`ui-btn-secondary px-4 py-2 text-sm font-semibold hover:bg-[var(--background)] transition-colors ${
+                  currentPage <= 1 ? "pointer-events-none opacity-40" : ""
                 }`}
               >
                 Previous
               </Link>
-              <span className="text-xs ui-subtle">
+              <span className="text-xs font-medium ui-subtle">
                 {totalCount === 0
                   ? "Showing 0 of 0"
                   : `Showing ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalCount)} of ${totalCount}`}
@@ -294,8 +298,8 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
               <Link
                 href={makePageHref(Math.min(totalPages, currentPage + 1))}
                 aria-disabled={currentPage >= totalPages}
-                className={`ui-btn-secondary px-4 py-2 text-sm font-semibold ${
-                  currentPage >= totalPages ? "pointer-events-none opacity-50" : ""
+                className={`ui-btn-secondary px-4 py-2 text-sm font-semibold hover:bg-[var(--background)] transition-colors ${
+                  currentPage >= totalPages ? "pointer-events-none opacity-40" : ""
                 }`}
               >
                 Next
