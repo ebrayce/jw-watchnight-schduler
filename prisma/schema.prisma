@@ -1,0 +1,63 @@
+generator client {
+  provider   = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+enum AssignmentSource {
+  AUTO
+  MANUAL
+}
+
+model Congregation {
+  id               String       @id @default(cuid())
+  name             String       @unique
+  overseer         String
+  contactPrimary   String
+  contactAlternate String?
+  meetingDays      Int[]
+  isActive         Boolean      @default(true)
+  assignments      Assignment[]
+  createdAt        DateTime     @default(now())
+  updatedAt        DateTime     @updatedAt
+}
+
+model SchedulerConfig {
+  id                   Int      @id @default(1)
+  assignmentWindowDays Int      @default(30)
+  assignmentsPerDay    Int      @default(1)
+  weekStartsOn         Int      @default(1)
+  avoidConsecutiveDays Boolean  @default(false)
+  createdAt            DateTime @default(now())
+  updatedAt            DateTime @updatedAt
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  eventType String
+  actor     String
+  ipAddress String?
+  userAgent String?
+  details   Json?
+  createdAt DateTime @default(now())
+
+  @@index([eventType, createdAt])
+}
+
+model Assignment {
+  id             String           @id @default(cuid())
+  date           DateTime
+  slot           Int              @default(0)
+  source         AssignmentSource @default(AUTO)
+  notes          String?
+  congregationId String
+  congregation   Congregation     @relation(fields: [congregationId], references: [id], onDelete: Restrict)
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  @@unique([date, slot])
+  @@index([congregationId, date])
+}

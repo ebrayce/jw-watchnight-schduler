@@ -1,36 +1,84 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# JW Watchnight Scheduler
 
-## Getting Started
+Secure scheduling app for assigning congregations to daily watchnight duty while preventing assignments on each congregation's local meeting days.
 
-First, run the development server:
+## Features
+
+- Admin-only access with signed `httpOnly` session cookie
+- Congregation CRUD: name, overseer, contacts, two fixed meeting days, active/inactive
+- Scheduler configuration: assignment window, assignments/day, week start day, optional consecutive-day avoidance
+- Auto-assignment engine with fairness balancing + random tie-breaking + conflict reasons
+- Manual assignment override with meeting-day safety validation
+- Audit log for schedule generation and manual overrides
+- Prisma + PostgreSQL persistence
+
+## Stack
+
+- Next.js 16 (App Router)
+- TypeScript (strict)
+- Prisma ORM
+- PostgreSQL
+- Zod validation
+
+## Quick Start
+
+1. Install dependencies
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+pnpm install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. Generate an admin password hash
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm auth:hash "change-me"
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+3. Create env file and fill secrets
 
-## Learn More
+```bash
+cp .env.example .env.local
+```
 
-To learn more about Next.js, take a look at the following resources:
+Required env vars in `.env.local`:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- `DATABASE_URL`
+- `SESSION_SECRET` (32+ random chars)
+- `ADMIN_PASSWORD_HASH` (`saltHex:hashHex`)
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. Generate Prisma client and run migration
 
-## Deploy on Vercel
+```bash
+pnpm prisma:generate
+pnpm prisma:migrate --name init
+pnpm db:seed
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. Start app
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+pnpm dev
+```
+
+Open `http://localhost:3000` and sign in at `/login`.
+
+## Main Routes
+
+- `/` dashboard
+- `/congregations` manage congregations
+- `/settings` scheduler configuration
+- `/schedule` auto-generate + manual overrides
+
+## Smoke Test (Scheduler Core)
+
+Runs the pure scheduler engine without DB writes:
+
+```bash
+pnpm scheduler:smoke
+```
+
+## Security Notes
+
+- Passwords are verified using `scrypt` and timing-safe comparison
+- Session cookies are `httpOnly`, `sameSite=strict`, and `secure` in production
+- Input validation is enforced with Zod in all write actions
