@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { logoutAction, updateSchedulerConfigAction } from "@/app/actions";
+import { StatusBanner } from "@/components/status-banner";
 import { dayLabels } from "@/lib/dates";
 import { requireAdmin } from "@/lib/guards";
 import { prisma } from "@/lib/prisma";
@@ -35,12 +36,8 @@ export default async function SettingsPage({ searchParams }: SettingsPageProps) 
       </header>
 
       <form action={updateSchedulerConfigAction} className="ui-card space-y-4 p-5 shadow-sm">
-        {params.ok ? (
-          <p className="ui-alert-success px-3 py-2 text-sm">{params.ok}</p>
-        ) : null}
-        {params.error ? (
-          <p className="ui-alert-error px-3 py-2 text-sm">{params.error}</p>
-        ) : null}
+        {params.ok ? <StatusBanner type="success" message={params.ok} /> : null}
+        {params.error ? <StatusBanner type="error" message={params.error} /> : null}
 
         <label className="block space-y-1">
           <span className="text-sm font-medium">Assignment window (days ahead)</span>

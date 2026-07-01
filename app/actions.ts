@@ -133,6 +133,23 @@ export async function deleteCongregationAction(formData: FormData): Promise<void
   }
 
   try {
+    const assignmentCount = await prisma.assignment.count({
+      where: { congregationId: id },
+    });
+
+    if (assignmentCount > 0) {
+      await prisma.congregation.update({
+        where: { id },
+        data: { isActive: false },
+      });
+
+      revalidatePath("/congregations");
+      revalidatePath("/schedule");
+      redirectWithStatus("/congregations", {
+        ok: `Congregation archived (inactive). It has ${assignmentCount} linked assignment(s), so it was not hard-deleted.`,
+      });
+    }
+
     await prisma.congregation.delete({ where: { id } });
     revalidatePath("/congregations");
     revalidatePath("/schedule");

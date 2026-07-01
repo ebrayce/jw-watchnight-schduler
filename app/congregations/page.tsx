@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { type Prisma } from "@prisma/client";
 import {
   createCongregationAction,
   deleteCongregationAction,
@@ -6,6 +7,7 @@ import {
   logoutAction,
   updateCongregationAction,
 } from "@/app/actions";
+import { StatusBanner } from "@/components/status-banner";
 import { dayLabels } from "@/lib/dates";
 import { requireAdmin } from "@/lib/guards";
 import { prisma } from "@/lib/prisma";
@@ -14,13 +16,13 @@ const weekdays = [0, 1, 2, 3, 4, 5, 6] as const;
 
 function MeetingDayPicker({ selected, inputName }: { selected: number[]; inputName: string }) {
   return (
-    <div className="grid grid-cols-4 gap-1.5 rounded-xl border border-[var(--border)] bg-[var(--surface-strong)] p-1.5 backdrop-blur-sm">
+    <div className="grid grid-cols-4 gap-1.5 rounded-xl border border-(--border) bg-(--surface-strong) p-1.5 backdrop-blur-sm">
       {weekdays.map((day) => {
         const isChecked = selected.includes(day);
         return (
           <label
             key={`${inputName}-${day}`}
-            className="flex flex-col items-center justify-center rounded-lg border border-transparent p-2 text-center transition-all has-[:checked]:border-[var(--primary)]/30 has-[:checked]:bg-[var(--background)] cursor-pointer"
+            className="flex flex-col items-center justify-center rounded-lg border border-transparent p-2 text-center transition-all has-checked:border-(--primary)/30 has-[:checked]:bg-[var(--background)] cursor-pointer"
           >
             <input
               type="checkbox"
@@ -40,16 +42,48 @@ function MeetingDayPicker({ selected, inputName }: { selected: number[]; inputNa
 }
 
 type CongregationsPageProps = {
-  searchParams: Promise<{ ok?: string; error?: string }>;
+  searchParams: Promise<{ ok?: string; error?: string; q?: string; page?: string }>;
 };
 
 export default async function CongregationsPage({ searchParams }: CongregationsPageProps) {
   await requireAdmin();
   const params = await searchParams;
 
+  const pageSize = 8;
+  const searchQuery = (params.q ?? "").trim();
+  const requestedPage = Number.parseInt(params.page ?? "1", 10);
+  const safeRequestedPage = Number.isNaN(requestedPage) || requestedPage < 1 ? 1 : requestedPage;
+
+  const where: Prisma.CongregationWhereInput = searchQuery
+    ? {
+        OR: [
+          { name: { contains: searchQuery, mode: "insensitive" } },
+          { overseer: { contains: searchQuery, mode: "insensitive" } },
+          { contactPrimary: { contains: searchQuery, mode: "insensitive" } },
+          { contactAlternate: { contains: searchQuery, mode: "insensitive" } },
+        ],
+      }
+    : {};
+
+  const totalCount = await prisma.congregation.count({ where });
+  const totalPages = Math.max(1, Math.ceil(totalCount / pageSize));
+  const currentPage = Math.min(safeRequestedPage, totalPages);
+
   const congregations = await prisma.congregation.findMany({
+    where,
     orderBy: { name: "asc" },
+    skip: (currentPage - 1) * pageSize,
+    take: pageSize,
   });
+
+  const makePageHref = (page: number): string => {
+    const query = new URLSearchParams();
+    if (searchQuery) {
+      query.set("q", searchQuery);
+    }
+    query.set("page", String(page));
+    return `/congregations?${query.toString()}`;
+  };
 
   return (
     <main className="app-shell w-full min-h-screen">
@@ -76,8 +110,8 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
         </header>
 
         {/* System Notification Banners */}
-        {params.ok && <p className="ui-alert-success px-4 py-3 text-sm font-medium">{params.ok}</p>}
-        {params.error && <p className="ui-alert-error px-4 py-3 text-sm font-medium">{params.error}</p>}
+        {params.ok ? <StatusBanner type="success" message={params.ok} /> : null}
+        {params.error ? <StatusBanner type="error" message={params.error} /> : null}
 
         {/* ========================================== */}
         {/* 2. PERSISTENT GRID ARCHITECTURE            */}
@@ -148,14 +182,40 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
 
           {/* MAIN RECORD VIEWS */}
           <section className="lg:col-span-2 space-y-4">
-            <div className="flex items-center justify-between px-2">
-              <h2 className="text-base font-bold ui-title">Active Congregations ({congregations.length})</h2>
-              <span className="text-xs ui-subtle">Alphabetical layout</span>
+            <div className="ui-card p-4">
+              <form className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between" action="/congregations" method="get">
+                <div className="flex-1">
+                  <label htmlFor="q" className="mb-1 block text-[11px] font-semibold uppercase tracking-wider ui-subtle">
+                    Search Congregations
+                  </label>
+                  <input
+                    id="q"
+                    name="q"
+                    defaultValue={searchQuery}
+                    placeholder="Name, overseer, or contact"
+                    className="ui-input text-sm"
+                  />
+                </div>
+                <div className="flex items-end gap-2">
+                  <button type="submit" className="ui-btn px-4 py-2 text-sm font-semibold">
+                    Search
+                  </button>
+                  <Link href="/congregations" className="ui-btn-secondary px-4 py-2 text-sm font-semibold">
+                    Reset
+                  </Link>
+                </div>
+              </form>
+              <div className="mt-3 flex items-center justify-between px-1">
+                <h2 className="text-base font-bold ui-title">Congregations ({totalCount})</h2>
+                <span className="text-xs ui-subtle">
+                  Page {currentPage} of {totalPages}
+                </span>
+              </div>
             </div>
 
             {congregations.length === 0 ? (
               <div className="ui-card p-12 text-center text-sm ui-subtle">
-                No records established. Use the generation pane to add data.
+                No matching records found. Adjust your search or add a new congregation.
               </div>
             ) : (
               congregations.map((congregation) => (
@@ -200,7 +260,6 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
                         <button
                           type="submit"
                           formAction={deleteCongregationAction}
-                          formMethod="post"
                           className="text-xs font-bold text-red-500 hover:text-red-600 transition-colors px-3 py-2 rounded-xl hover:bg-red-500/10 cursor-pointer"
                         >
                           Remove Cong
@@ -214,6 +273,32 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
                 </article>
               ))
             )}
+
+            <div className="flex items-center justify-between px-2">
+              <Link
+                href={makePageHref(Math.max(1, currentPage - 1))}
+                aria-disabled={currentPage <= 1}
+                className={`ui-btn-secondary px-4 py-2 text-sm font-semibold ${
+                  currentPage <= 1 ? "pointer-events-none opacity-50" : ""
+                }`}
+              >
+                Previous
+              </Link>
+              <span className="text-xs ui-subtle">
+                {totalCount === 0
+                  ? "Showing 0 of 0"
+                  : `Showing ${(currentPage - 1) * pageSize + 1}-${Math.min(currentPage * pageSize, totalCount)} of ${totalCount}`}
+              </span>
+              <Link
+                href={makePageHref(Math.min(totalPages, currentPage + 1))}
+                aria-disabled={currentPage >= totalPages}
+                className={`ui-btn-secondary px-4 py-2 text-sm font-semibold ${
+                  currentPage >= totalPages ? "pointer-events-none opacity-50" : ""
+                }`}
+              >
+                Next
+              </Link>
+            </div>
           </section>
 
         </div>

@@ -1,10 +1,10 @@
 import Link from "next/link";
 import { generateScheduleAction, logoutAction, overrideAssignmentAction } from "@/app/actions";
+import { StatusBanner } from "@/components/status-banner";
 import { dayLabels, formatDateKey, toDateInputValue } from "@/lib/dates";
 import { requireAdmin } from "@/lib/guards";
 import { prisma } from "@/lib/prisma";
 
-// Clean unified utility formatting
 function formatDate(value: Date): string {
   return new Intl.DateTimeFormat("en-GB", {
     year: "numeric",
@@ -15,12 +15,15 @@ function formatDate(value: Date): string {
 }
 
 type SchedulePageProps = {
-  searchParams: Promise<{ ok?: string; error?: string }>;
+  searchParams: Promise<{ ok?: string; error?: string; tab?: string }>;
 };
 
 export default async function SchedulePage({ searchParams }: SchedulePageProps) {
   await requireAdmin();
   const params = await searchParams;
+
+  // Default to 'upcoming' view if no tab parameter exists
+  const activeTab = params.tab === "audit" ? "audit" : "upcoming";
 
   const [config, congregations, assignments, auditLogs] = await Promise.all([
     prisma.schedulerConfig.findUnique({ where: { id: 1 } }),
@@ -83,8 +86,8 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
         </header>
 
         {/* Global Action Banners */}
-        {params.ok && <p className="ui-alert-success px-4 py-3 text-sm font-medium">{params.ok}</p>}
-        {params.error && <p className="ui-alert-error px-4 py-3 text-sm font-medium">{params.error}</p>}
+        {params.ok ? <StatusBanner type="success" message={params.ok} /> : null}
+        {params.error ? <StatusBanner type="error" message={params.error} /> : null}
 
         {/* ========================================== */}
         {/* 2. TWO-COLUMN OPERATIONAL SPLIT LAYOUT     */}
@@ -160,53 +163,72 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
             </section>
           </div>
 
-          {/* RIGHT COLUMN: REVIEWS & LIVE AUDITING */}
-          <div className="lg:col-span-2 space-y-6">
+          {/* RIGHT COLUMN: REVIEWS & LIVE AUDITING (TABBED) */}
+          <div className="lg:col-span-2 space-y-4">
 
-            {/* Output Segment: Assignments Stream */}
-            <section className="space-y-3">
-              <div className="flex items-center justify-between px-1">
-                <h2 className="text-base font-bold ui-title">Upcoming Calendars</h2>
-                <span className="text-xs ui-subtle">Chronological sort</span>
-              </div>
+            {/* Tab Controller Bar */}
+            <div className="flex border-b border-[var(--border)] p-1 gap-2 bg-[var(--surface-strong)] rounded-xl backdrop-blur-sm border">
+              <Link
+                href="?tab=upcoming"
+                scroll={false}
+                className={`flex-1 text-center py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
+                  activeTab === "upcoming"
+                    ? "bg-[var(--background)] border border-[var(--border)] ui-title shadow-sm"
+                    : "ui-subtle hover:bg-[var(--background)]/40"
+                }`}
+              >
+                📅 Upcoming Calendars
+              </Link>
+              <Link
+                href="?tab=audit"
+                scroll={false}
+                className={`flex-1 text-center py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
+                  activeTab === "audit"
+                    ? "bg-[var(--background)] border border-[var(--border)] ui-title shadow-sm"
+                    : "ui-subtle hover:bg-[var(--background)]/40"
+                }`}
+              >
+                🛡️ Security Audit Trail
+              </Link>
+            </div>
 
-              {grouped.size === 0 ? (
-                <div className="ui-card p-12 text-center text-sm ui-subtle">
-                  No upcoming slot assignments computed. Trigger the generator loop on the side panel.
-                </div>
-              ) : (
-                Array.from(grouped.entries()).map(([date, rows]) => (
-                  <article key={date} className="ui-card p-5 transition-all hover:border-zinc-400/20 dark:hover:border-zinc-500/20">
-                    <h3 className="font-bold ui-title text-sm border-b border-[var(--border)] pb-2 mb-3">
-                      {formatDate(rows[0]?.date ?? new Date(date))}
-                    </h3>
-                    <div className="space-y-2.5">
-                      {rows.map((row) => (
-                        <div key={row.id} className="flex flex-wrap items-center justify-between text-sm gap-2">
-                          <p className="ui-title">
-                            <span className="inline-block min-w-[55px] font-bold text-xs uppercase ui-subtle tracking-wider bg-[var(--surface-strong)] px-2 py-0.5 rounded border border-[var(--border)] mr-2">
-                              Slot {row.slot + 1}
-                            </span>
-                            <strong className="font-semibold">{row.congregation.name}</strong>
-                          </p>
-                          <div className="flex items-center gap-3">
-                            {row.notes && <span className="text-xs italic ui-subtle bg-amber-500/5 px-2 py-0.5 rounded border border-amber-500/10 text-amber-600 dark:text-amber-400">{row.notes}</span>}
-                            <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${row.source === 'MANUAL' ? 'bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400' : 'ui-subtle bg-[var(--surface-strong)]'}`}>
-                              {row.source}
-                            </span>
+            {/* TAB PANELS */}
+            {activeTab === "upcoming" ? (
+              <section className="space-y-3">
+                {grouped.size === 0 ? (
+                  <div className="ui-card p-12 text-center text-sm ui-subtle">
+                    No upcoming slot assignments computed. Trigger the generator loop on the side panel.
+                  </div>
+                ) : (
+                  Array.from(grouped.entries()).map(([date, rows]) => (
+                    <article key={date} className="ui-card p-5 transition-all hover:border-zinc-400/20 dark:hover:border-zinc-500/20">
+                      <h3 className="font-bold ui-title text-sm border-b border-[var(--border)] pb-2 mb-3">
+                        {formatDate(rows[0]?.date ?? new Date(date))}
+                      </h3>
+                      <div className="space-y-2.5">
+                        {rows.map((row) => (
+                          <div key={row.id} className="flex flex-wrap items-center justify-between text-sm gap-2">
+                            <p className="ui-title">
+                              <span className="inline-block min-w-[55px] font-bold text-xs uppercase ui-subtle tracking-wider bg-[var(--surface-strong)] px-2 py-0.5 rounded border border-[var(--border)] mr-2">
+                                Slot {row.slot + 1}
+                              </span>
+                              <strong className="font-semibold">{row.congregation.name}</strong>
+                            </p>
+                            <div className="flex items-center gap-3">
+                              {row.notes && <span className="text-xs italic ui-subtle bg-amber-500/5 px-2 py-0.5 rounded border border-amber-500/10 text-amber-600 dark:text-amber-400">{row.notes}</span>}
+                              <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-0.5 rounded ${row.source === 'MANUAL' ? 'bg-purple-500/10 border border-purple-500/20 text-purple-600 dark:text-purple-400' : 'ui-subtle bg-[var(--surface-strong)]'}`}>
+                                {row.source}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
-                  </article>
-                ))
-              )}
-            </section>
-
-            {/* Output Segment: Security Logs */}
-            <section className="space-y-3">
-              <h2 className="text-base font-bold ui-title px-1">Security Audit Trail</h2>
-              <div className="space-y-2">
+                        ))}
+                      </div>
+                    </article>
+                  ))
+                )}
+              </section>
+            ) : (
+              <section className="space-y-2">
                 {auditLogs.length === 0 ? (
                   <p className="text-sm ui-subtle p-4">No audit events logged in this instance environment.</p>
                 ) : (
@@ -244,8 +266,8 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
                     );
                   })
                 )}
-              </div>
-            </section>
+              </section>
+            )}
 
           </div>
 
