@@ -112,7 +112,7 @@ export default async function SchedulePage({ searchParams }: SchedulePageProps) 
               </form>
               <form action={clearScheduleAction}>
                 <button type="submit" className="ui-btn-secondary w-full py-2.5 text-xs font-bold cursor-pointer">
-                  Clear Schedule (Today+)
+                  Clear Schedule
                 </button>
               </form>
             </section>

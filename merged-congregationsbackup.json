@@ -1,0 +1,424 @@
+{
+  "congregationMeetings": [
+    {
+      "name": "Fort Orange Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 5,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0249330335; 0244549873"
+    },
+    {
+      "name": "Adiembra Road South Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0247605583/0547380387"
+    },
+    {
+      "name": "Ketan Road West Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0248306674  and  0208903717"
+    },
+    {
+      "name": "Ketan Road East Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0244021328"
+    },
+    {
+      "name": "Adiembra Ridge Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 1,
+      "weekendMeetingDay": 6,
+      "phoneNumber": "0594293436"
+    },
+    {
+      "name": "Adiembra Road English - Adiembra Road WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": null
+    },
+    {
+      "name": "Upper Harbor Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0277735847/0508333320"
+    },
+    {
+      "name": "North Harbor Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "+233509354208"
+    },
+    {
+      "name": "Efia New Road Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0207614443"
+    },
+    {
+      "name": "Nkroful South Town Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 5,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0559114165"
+    },
+    {
+      "name": "Fijai Town Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0550283473"
+    },
+    {
+      "name": "Nkroful Town Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0244588618, 0543441143"
+    },
+    {
+      "name": "Nkroful Town Ahanta - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0277319934"
+    },
+    {
+      "name": "North Hills English - Sekondi Takoradi WP",
+      "midweekMeetingDay": 1,
+      "weekendMeetingDay": 6,
+      "phoneNumber": "0246237432"
+    },
+    {
+      "name": "Esikado Town Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0246222386, 0247737283"
+    },
+    {
+      "name": "Windy Ridge English - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0242282618 "
+    },
+    {
+      "name": "Efia Valley Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0241536660 / 0244136988"
+    },
+    {
+      "name": "Efia Down Hill Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 1,
+      "weekendMeetingDay": 6,
+      "phoneNumber": "0202463905/0209066445"
+    },
+    {
+      "name": "Efia Hill Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 5,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0554573752"
+    },
+    {
+      "name": "Anaji Town Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0208210022"
+    },
+    {
+      "name": "Anaji Hill Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0555705749"
+    },
+    {
+      "name": "Anaji English - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0204436991"
+    },
+    {
+      "name": "Nkenya Town Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0242068124,  05580441012,  0249116758"
+    },
+    {
+      "name": "Diabene Hills Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 6,
+      "phoneNumber": null
+    },
+    {
+      "name": "Nkenya West Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0557715370/0271979111/0249333306"
+    },
+    {
+      "name": "Kojokrom East Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0204562329"
+    },
+    {
+      "name": "Mpintsin Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 5,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0544099100/0240303993"
+    },
+    {
+      "name": "Upper Kojokrom Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0546646661/0249386801"
+    },
+    {
+      "name": "Kojokrom English - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0243591382\\0245282333"
+    },
+    {
+      "name": "Factory Road Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 1,
+      "weekendMeetingDay": 6,
+      "phoneNumber": "0542206703"
+    },
+    {
+      "name": "Airport Ridge English - Sekondi Takoradi WP",
+      "midweekMeetingDay": 5,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "+233248406554"
+    },
+    {
+      "name": "West Airport Ridge Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0244454860"
+    },
+    {
+      "name": "Airport Ridge Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "2330203001859 / 2330209295746"
+    },
+    {
+      "name": "South Beach Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 6,
+      "phoneNumber": "0244582921"
+    },
+    {
+      "name": "Harbor Road West Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": null
+    },
+    {
+      "name": "Market Circle Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0208086964, 0244436907"
+    },
+    {
+      "name": "South Beach English - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 6,
+      "phoneNumber": "0244708229, 0201082316,0276264796,0244159886"
+    },
+    {
+      "name": "Harbor Road East Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0554393442/0243663052"
+    },
+    {
+      "name": "Anaji North Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 1,
+      "weekendMeetingDay": 6,
+      "phoneNumber": "0530304494 / 0264010168"
+    },
+    {
+      "name": "Anaji North English - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0244937117"
+    },
+    {
+      "name": "Ntankoful Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0559178486"
+    },
+    {
+      "name": "Anaji East Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0531092181/ 0541154001"
+    },
+    {
+      "name": "Kwasimintsim Ahanta - Sekondi Takoradi WP",
+      "midweekMeetingDay": 5,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0541385112 / 0240579516"
+    },
+    {
+      "name": "Kwasimintsim English - Sekondi Takoradi WP",
+      "midweekMeetingDay": 5,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0242083549; 0244878088"
+    },
+    {
+      "name": "Apremdo Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "024-480-6396"
+    },
+    {
+      "name": "Kwasimintsim Town Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "+233 244 781 000"
+    },
+    {
+      "name": "Assakae Town Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0553142401 / 0246592349"
+    },
+    {
+      "name": "Assakae East Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 6,
+      "phoneNumber": "0542044610"
+    },
+    {
+      "name": "Assakae West Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0244748424"
+    },
+    {
+      "name": "Whindo Town Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0240240336  0241947522. 0541532700"
+    },
+    {
+      "name": "Inchaban Town Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 0,
+      "phoneNumber": null
+    },
+    {
+      "name": "Stadium Village Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 5,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0243889175"
+    },
+    {
+      "name": "West Reservoir Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0557422333"
+    },
+    {
+      "name": "Inchaban English - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0246491527"
+    },
+    {
+      "name": "Power Hill Fante - Aboadze WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0240222468/0544185619"
+    },
+    {
+      "name": "Apowa North Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0547587049/020 819 5504"
+    },
+    {
+      "name": "Apowa Ahanta - Apowa WP",
+      "midweekMeetingDay": 5,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0244998209/0207260432"
+    },
+    {
+      "name": "Apowa West Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": null
+    },
+    {
+      "name": "Apowa English - Sekondi Takoradi WP",
+      "midweekMeetingDay": 1,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "+233246880181"
+    },
+    {
+      "name": "Apowa South Fante - Sekondi Takoradi WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 6,
+      "phoneNumber": "0243863478/0274333773"
+    },
+    {
+      "name": "Kejabil Ahanta - Sekondi Takoradi WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0206326937 / 0208935583"
+    },
+    {
+      "name": "Cocoa Road Ahanta - Sekondi Takoradi WP",
+      "midweekMeetingDay": 6,
+      "weekendMeetingDay": 3,
+      "phoneNumber": "0247252164 / 0508068778"
+    },
+    {
+      "name": "East Junction Fante - Shama WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0277045398/0276082094"
+    },
+    {
+      "name": "Reservoir Valley Fante - Shama WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 6,
+      "phoneNumber": "0248228493"
+    },
+    {
+      "name": "West Junction Fante - Shama WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0243446141/0246976969"
+    },
+    {
+      "name": "Beahu Fante - Beahu WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0244748904"
+    },
+    {
+      "name": "Junction South Ahanta - Beahu WP",
+      "midweekMeetingDay": 2,
+      "weekendMeetingDay": 6,
+      "phoneNumber": "0550522931/0264038815"
+    },
+    {
+      "name": "Junction North Ahanta - Beahu WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 6,
+      "phoneNumber": "0545104686"
+    },
+    {
+      "name": "Delta Beach North Fante - Shama WP",
+      "midweekMeetingDay": 3,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0540792344 / 0241575758 / 0244530077"
+    },
+    {
+      "name": "Delta Beach South Fante - Shama WP",
+      "midweekMeetingDay": 4,
+      "weekendMeetingDay": 0,
+      "phoneNumber": "0500347200"
+    }
+  ]
+}

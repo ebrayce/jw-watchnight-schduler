@@ -21,12 +21,16 @@ export function StatusBanner({ type, message, autoCloseSeconds = 20 }: StatusBan
   const clearStatus = useCallback(() => {
     setIsVisible(false);
 
-    const nextParams = new URLSearchParams(searchParams.toString());
-    nextParams.delete("ok");
-    nextParams.delete("error");
+    // Defer the router update to the next execution turn of the JS engine event loop.
+    // This cleanly prevents cross-component context execution collision during active renders.
+    setTimeout(() => {
+      const nextParams = new URLSearchParams(searchParams.toString());
+      nextParams.delete("ok");
+      nextParams.delete("error");
 
-    const query = nextParams.toString();
-    router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+      const query = nextParams.toString();
+      router.replace(query ? `${pathname}?${query}` : pathname, { scroll: false });
+    }, 0);
   }, [pathname, router, searchParams]);
 
   useEffect(() => {
@@ -34,8 +38,6 @@ export function StatusBanner({ type, message, autoCloseSeconds = 20 }: StatusBan
       return;
     }
 
-    // Move the interval tick logic into a functional state updater block.
-    // This allows us to handle state transitions safely inside the asynchronous API callback.
     const timeoutId = window.setInterval(() => {
       setRemainingSeconds((current) => {
         if (current <= 1) {

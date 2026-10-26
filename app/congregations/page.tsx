@@ -267,7 +267,7 @@ export default async function CongregationsPage({ searchParams }: CongregationsP
                           formAction={deleteCongregationAction}
                           className="text-xs font-bold text-red-500 hover:text-red-600 transition-colors px-3 py-2 rounded-xl hover:bg-red-500/10 cursor-pointer"
                         >
-                          Remove Unit
+                          Remove
                         </button>
                         <button type="submit" className="ui-btn px-6 py-2 text-xs font-semibold cursor-pointer shadow-md shadow-[var(--primary)]/5">
                           Save Changes
